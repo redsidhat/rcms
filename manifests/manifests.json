@@ -1,0 +1,26 @@
+{
+    "play":{
+        "basic-install":{
+            "packages":{
+                "php": "1:7.2+60ubuntu1",
+                "nginx": "present",
+                "zip": "absent"
+
+            },
+            "files":{
+                "/tmp/content.txt":{
+                    "content": "test",
+                    "owner": "root",
+                    "group": "root",
+                    "chmod": 400
+                },
+                "/tmp/file.txt":{
+                    "source": "files/file.txt",
+                    "owner": "root",
+                    "group": "root",
+                    "chmod": 644
+                }
+            }
+        }
+    }
+}

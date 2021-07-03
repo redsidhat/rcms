@@ -1,6 +1,7 @@
 # loaded config 
 conf = { 
          'HOSTS_FILE': "hosts/hosts.json",
+         'MANIFEST_FILE':"manifests/manifests.json"
 }
 
 class Config(object):

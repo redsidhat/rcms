@@ -9,6 +9,7 @@ class site(Config):
         print("Getting site details")
         super().__init__()
         self.host_file=self.get_property('HOSTS_FILE')
+        self.manifest_file=self.get_property('MANIFEST_FILE')
 
 
     def get_connect_data(self,hosts,hostname,property):
@@ -24,6 +25,19 @@ class site(Config):
             print("JSON load failef for file" + self.host_file)
         return data[hosts][hostname][property]
 
+    def get_exec_data(self,play_name):
+        print(self.manifest_file)
+        try:
+            f=open(self.manifest_file,'r')
+        except IOError:
+            print("Error: File does not appear to exist.")
+            return False
+        try:
+            data=json.load(f)
+        except:
+            print("JSON load failef for file" + self.host_file)
+        for key in data['play'][play_name]:
+            print(key)
 
  
 
@@ -55,8 +69,11 @@ class connect(site):
         
         print(ssh_stdout.read().decode())
 
+
+#class packages(site)
 if __name__ == '__main__':
     obj=connect()
     obj.ssh('webservers','host1','date1')
+    obj.get_exec_data('basic-install')
    # print(str(obj.get_host_ip('webservers','host1','ip')))
 
