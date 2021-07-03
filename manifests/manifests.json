@@ -9,7 +9,7 @@
             },
             "files":{
                 "/tmp/content.txt":{
-                    "content": "test",
+                    "content": "test content",
                     "owner": "root",
                     "group": "root",
                     "chmod": 400,

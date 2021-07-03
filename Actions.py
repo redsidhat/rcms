@@ -1,5 +1,6 @@
 from Connect import Connect
 import re
+import hashlib
 class Actions(Connect):
     def __init__(self):
         super().__init__()
@@ -54,4 +55,43 @@ class Actions(Connect):
     def file_manager(self,file_list):
         #self.connect_data=self.get_connect_data(self.play_name)
         for filename, filedata in file_list.items():
-            print(filename)
+            is_file_changed = False
+            is_file_present = False
+            server_md5 = ''
+            #checking if file exist in server
+            stdout, stderr = self.ssh(self.connect_data,'md5sum %s' %filename)
+
+            if stdout.channel.recv_exit_status() == 0:
+                is_file_present = True
+                server_md5 = stdout.read().decode('ascii').split(' ')[0]
+
+            if filedata['status'] == 'present':
+                if 'content' in filedata:
+                    file_content=filedata['content']
+
+                elif 'source' in filedata:
+                    with open(filedata['source'], 'r') as file:
+                        file_content = file.read()
+                else:
+                    print("no file source or content defined skipping resource.")
+                    break
+                if not is_file_present:
+                    print("write file here")
+                else:
+                    m = hashlib.md5()
+                    m.update(file_content)
+                    actul_md5=m.hexdigest()
+                    if actul_md5 == server_md5:
+                        print("No changes for file %s" %filename)
+                    else:
+                        print('write file')
+
+            elif filedata['status'] =='directory':
+                print("create dir")
+            elif filedata['status'] =='absent':
+                print("delete file")
+            else:
+                print("bad config.")
+                break
+
+                
