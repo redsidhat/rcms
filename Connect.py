@@ -4,11 +4,10 @@ class Connect(Site):
 
     def __init__(self):
         super().__init__()
-        print("connecting "+self.host_file)
+        # print("connecting "+self.host_file)
 
     def ssh(self,connect_data,command):
         for key, host in connect_data.items():
-            print(host)
             self.ssh_hostname=host['ip']
             self.ssh_user=host['user']
             

@@ -8,16 +8,6 @@
 
             },
             "files":{
-                "/tmp/content.txt":{
-                    "content": "test content",
-                    "owner": "root",
-                    "group": "root",
-                    "chmod": 400,
-                    "status": "present",
-                    "refresh": {
-                        "service": "nginx"
-                    }
-                },
                 "/tmp/file.txt":{
                     "source": "files/file.txt",
                     "owner": "root",

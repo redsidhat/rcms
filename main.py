@@ -8,7 +8,8 @@ if __name__ == '__main__':
         if mod=='packages':
             #print(key)
             #actions=packages()
-            obj.package_manager(key)
+            #obj.package_manager(key)
+            print("skip")
         elif mod=='files':
             #print(key)
             obj.file_manager(key)

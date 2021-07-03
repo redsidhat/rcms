@@ -55,41 +55,60 @@ class Actions(Connect):
     def file_manager(self,file_list):
         #self.connect_data=self.get_connect_data(self.play_name)
         for filename, filedata in file_list.items():
-            is_file_changed = False
+            print("Processing file %s" %filename)
+            is_file_content_changed = False
             is_file_present = False
+            is_file_permission_changed = False
             server_md5 = ''
+            actul_md5 = ''
             #checking if file exist in server
-            stdout, stderr = self.ssh(self.connect_data,'md5sum %s' %filename)
 
-            if stdout.channel.recv_exit_status() == 0:
-                is_file_present = True
-                server_md5 = stdout.read().decode('ascii').split(' ')[0]
 
             if filedata['status'] == 'present':
-                if 'content' in filedata:
-                    file_content=filedata['content']
+                stdout, stderr = self.ssh(self.connect_data,'md5sum %s' %filename)
+                if stdout.channel.recv_exit_status() == 0:
+                    is_file_present = True
+                    server_md5 = stdout.read().decode('ascii').split(' ')[0]
+                   # file_permission = awk '{k=0;for(i=0;i<=8;i++)k+=((substr($1,i+2,1)~/[rwx]/) *2^(8-i));if(k)printf("%0o ",k);print $1}'
+                    cmd="stat -c '%a %U %G' "+ filename
+                    stdout, stderr = self.ssh(self.connect_data, cmd )
+                    output = stdout.read().decode('ascii').strip('\n').split(' ')
+                    server_file_permisison = output[0]
+                    server_file_owner= output[1]
+                    server_file_group= output[2]
+                    if filedata['owner'] != server_file_owner or filedata['group'] != server_file_group:
+                        print("updating ownership for %s" %filename)
+                        self.ssh(self.connect_data, 'chown %s:%s %s' %(filedata['owner'],filedata['group'], filename) )
+                    if filedata['chmod'] != server_file_permisison:
+                        print("updating permissions for %s" %filename)
+                        self.ssh(self.connect_data, 'chmod %s %s' %(filedata['chmod'], filename))
 
-                elif 'source' in filedata:
-                    with open(filedata['source'], 'r') as file:
+                if 'source' in filedata:
+                    with open(filedata['source'], 'r',) as file:
                         file_content = file.read()
+                        actul_md5 = hashlib.md5()
+                        actul_md5.update(file_content.encode())
                 else:
                     print("no file source or content defined skipping resource.")
                     break
                 if not is_file_present:
-                    print("write file here")
+                    is_file_content_changed = True
                 else:
-                    m = hashlib.md5()
-                    m.update(file_content)
-                    actul_md5=m.hexdigest()
-                    if actul_md5 == server_md5:
+                    if actul_md5.hexdigest() == server_md5:
                         print("No changes for file %s" %filename)
                     else:
-                        print('write file')
+                        is_file_content_changed = True
+
+                if is_file_content_changed:
+                    stdout, stderr = self.ssh(self.connect_data,'echo -n %s>%s' %(file_content,filename))
+                else:
+                    print("no write required %s" %filename)
+
 
             elif filedata['status'] =='directory':
-                print("create dir")
+                stdout, stderr = self.ssh(self.connect_data,'mkdir -p %s' %(filename))
             elif filedata['status'] =='absent':
-                print("delete file")
+                stdout, stderr = self.ssh(self.connect_data,'rm -f %s' %(filename))
             else:
                 print("bad config.")
                 break
