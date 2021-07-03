@@ -4,9 +4,13 @@ class Actions(Connect):
     def __init__(self):
         super().__init__()
         print("packages ")
-        
-    def package_manager(self,package_list):
+
+    def init_connections(self):
         self.connect_data=self.get_connect_data(self.play_name)
+
+    def package_manager(self,package_list):
+        #self.connect_data=self.get_connect_data(self.play_name)
+        # print(self.connect_data)
         for package_name, status in package_list.items():
             available, installed , version= self.check_package_status(package_name)
             if status == "present" and installed:
@@ -27,6 +31,7 @@ class Actions(Connect):
                 else:
                     print("installing package %s with version %s" %(package_name,status))
                     self.ssh(self.connect_data,'apt install -y %s=%s' %(package_name,status))
+
     def check_package_status(self, package_name):
         stdout, stderr = self.ssh(self.connect_data,'apt-cache policy %s' %(package_name))
         output=stdout.read().decode('ascii')
@@ -45,3 +50,8 @@ class Actions(Connect):
             installed=False
             version=None
         return available, installed, version
+
+    def file_manager(self,file_list):
+        #self.connect_data=self.get_connect_data(self.play_name)
+        for filename, filedata in file_list.items():
+            print(filename)

@@ -12,13 +12,24 @@
                     "content": "test",
                     "owner": "root",
                     "group": "root",
-                    "chmod": 400
+                    "chmod": 400,
+                    "status": "present",
+                    "refresh": {
+                        "service": "nginx"
+                    }
                 },
                 "/tmp/file.txt":{
                     "source": "files/file.txt",
                     "owner": "root",
                     "group": "root",
-                    "chmod": 644
+                    "chmod": 644,
+                    "status": "present"
+                },
+                "/tmp/mydir":{
+                    "owner": "root",
+                    "group": "root",
+                    "chmod": 644,
+                    "status": "directory"
                 }
             }
         }
