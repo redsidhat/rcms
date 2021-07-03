@@ -1,6 +1,6 @@
 {
     "play":{
-        "basic-install":{
+        "webservers":{
             "packages":{
                 "php": "1:7.2+60ubuntu1",
                 "nginx": "present",
