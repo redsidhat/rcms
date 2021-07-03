@@ -11,7 +11,6 @@ class site(Config):
         self.host_file=self.get_property('HOSTS_FILE')
         self.manifest_file=self.get_property('MANIFEST_FILE')
 
-
     def get_connect_data(self,host_groups):
         print(self.host_file)
         try:
@@ -23,6 +22,12 @@ class site(Config):
             data=json.load(f)
         except:
             print("JSON load failef for file" + self.host_file)
+        # if 'ssh_password' not in locals():
+        try:
+            self.ssh_password = getpass.getpass()
+        except Exception as error:
+            print('ERROR', error)
+
         return data[host_groups]
 
     def get_exec_data(self,play_name):
@@ -39,7 +44,6 @@ class site(Config):
             print("JSON load failef for file" + self.host_file)
         return data['play'][play_name]
 
- 
 
 class connect(site):
 
@@ -52,11 +56,7 @@ class connect(site):
             print(host)
             self.ssh_hostname=host['ip']
             self.ssh_user=host['user']
-            try:
-                self.ssh_password = getpass.getpass()
-            except Exception as error:
-                print('ERROR', error)
-
+            
             ssh = paramiko.SSHClient() 
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             try:
@@ -72,27 +72,27 @@ class connect(site):
             print(ssh_stdout.read().decode())
 
 
-class packages(connect):
+class actions(connect):
     def __init__(self):
         super().__init__()
         print("packages ")
+
     def package_manager(self,package_list):
-        dir(package_list)
+        connect_data=self.get_connect_data(self.play_name)
         for package_name, status in package_list.items():
             if status == "present":
                 print("installing package %s with available latest version" %package_name)
-                connect_data=self.get_connect_data(self.play_name)
-                print(connect_data)
-                print('------------------')
-                self.ssh(connect_data,'date')
+                self.ssh(connect_data,'apt install -y %s' %package_name)
             elif status == "absent":
                 print("Removing package %s" %package_name)
+                self.ssh(connect_data,'apt remove -y %s' %(package_name))
             else:
                 print("installing package %s with version %s" %(package_name,status))
+                self.ssh(connect_data,'apt install -y %s=%s' %(package_name,status))
 
 
 if __name__ == '__main__':
-    obj=packages()
+    obj=actions()
 #    obj.ssh('webservers','host1','date1')
     mods=obj.get_exec_data('webservers')
     for mod,key in mods.items():
