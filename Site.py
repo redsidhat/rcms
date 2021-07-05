@@ -5,13 +5,12 @@ import getpass
 class Site(Config):
 
     def __init__(self):
-        print("Getting site details")
+        print("Getting config values to initiate rcms")
         super().__init__()
         self.host_file=self.get_property('HOSTS_FILE')
         self.manifest_file=self.get_property('MANIFEST_FILE')
 
     def get_connect_data(self,host_groups):
-        print(self.host_file)
         try:
             f=open(self.host_file,'r')
         except IOError:
@@ -43,7 +42,8 @@ class Site(Config):
             print("JSON load failef for file" + self.host_file)
         return data['play'][play_name]
 
-
+    def set_connect_data(self,connect_data):
+        self.connect_data=connect_data
 
 
 

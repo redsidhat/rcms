@@ -4,10 +4,12 @@ import hashlib
 class Actions(Connect):
     def __init__(self):
         super().__init__()
-        print("packages ")
+        # print("Actions are initiated")
 
-    def init_connections(self):
-        self.connect_data=self.get_connect_data(self.play_name)
+    # def init_connections(self):
+    #     self.connect_data=self.get_connect_data(self.play_name)
+        # print("Initiated connect data")
+        # print(self.connect_data)
 
     def package_manager(self,package_list):
         #self.connect_data=self.get_connect_data(self.play_name)
@@ -77,9 +79,11 @@ class Actions(Connect):
                     server_file_owner= output[1]
                     server_file_group= output[2]
                     if filedata['owner'] != server_file_owner or filedata['group'] != server_file_group:
+                        is_file_permission_changed= True
                         print("updating ownership for %s" %filename)
                         self.ssh(self.connect_data, 'chown %s:%s %s' %(filedata['owner'],filedata['group'], filename) )
-                    if filedata['chmod'] != server_file_permisison:
+                    if filedata['chmod'] != int(server_file_permisison):
+                        is_file_permission_changed = True
                         print("updating permissions for %s" %filename)
                         self.ssh(self.connect_data, 'chmod %s %s' %(filedata['chmod'], filename))
 
