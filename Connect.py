@@ -9,7 +9,7 @@ class Connect(Site):
 
     def ssh(self,connect_data,command):
         host=connect_data[1]
-        self.ssh_hostname=host['ip']
+        self.ssh_hostname=host['ip'] 
         self.ssh_user=host['user']
         
         ssh = paramiko.SSHClient() 

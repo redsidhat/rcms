@@ -5,21 +5,30 @@
                 "php": "1:7.2+60ubuntu1",
                 "nginx": "present",
                 "zip": "absent"
-
             },
+    
             "files":{
                 "/tmp/file.txt":{
                     "source": "files/file.txt",
                     "owner": "root",
                     "group": "root",
                     "chmod": 644,
-                    "status": "present"
+                    "status": "present",
+                    "refresh": "apache2"
                 },
                 "/tmp/mydir":{
                     "owner": "root",
                     "group": "root",
                     "chmod": 644,
                     "status": "directory"
+                }
+            },
+            "services":{
+                "nginx":{
+                    "status":"restart"
+                },
+                "ssh":{
+                    "status":"running"
                 }
             }
         }

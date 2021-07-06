@@ -71,7 +71,6 @@ class Actions(Connect):
                 if stdout.channel.recv_exit_status() == 0:
                     is_file_present = True
                     server_md5 = stdout.read().decode('ascii').split(' ')[0]
-                   # file_permission = awk '{k=0;for(i=0;i<=8;i++)k+=((substr($1,i+2,1)~/[rwx]/) *2^(8-i));if(k)printf("%0o ",k);print $1}'
                     cmd="stat -c '%a %U %G' "+ filename
                     stdout, stderr = self.ssh(self.connect_data, cmd )
                     output = stdout.read().decode('ascii').strip('\n').split(' ')
@@ -107,7 +106,8 @@ class Actions(Connect):
                     stdout, stderr = self.ssh(self.connect_data,'echo -n %s>%s' %(file_content,filename))
                 else:
                     print("no write required %s" %filename)
-
+                if 'refresh' in filedata and is_file_content_changed:
+                    self.service_handle(filedata['refresh'],'restart')
 
             elif filedata['status'] =='directory':
                 stdout, stderr = self.ssh(self.connect_data,'mkdir -p %s' %(filename))
@@ -117,4 +117,33 @@ class Actions(Connect):
                 print("bad config.")
                 break
 
-                
+    def service_handle(self, service, action):
+        stdout, stderr = self.ssh(self.connect_data,'systemctl status %s' %service)
+        output = stdout.read().decode()
+        sysctl_status='unknown'
+        sysctl_enabled=False
+        if 'Active: active (running)' in output:
+            print("Service is running")
+            sysctl_status='running'
+        else:
+            sysctl_status='stopped'
+        if re.match('Loaded:.*enabled', output):
+            sysctl_enabled=True
+        else:
+            sysctl_enabled=False
+
+        if sysctl_status == action:
+            print("service %s is already in %s state" %(service, action))
+            return True
+        if action=='running' or action=='restart' or action=='reload':
+            if not sysctl_enabled:
+                print("Enabling service")
+                self.ssh(self.connect_data,'systemctl enable %s' %service)
+            self.ssh(self.connect_data,'systemctl %s %s' %(action,service))
+
+
+    def service_manager(self,services_list):
+        print(services_list)
+        for service, status in services_list.items():
+            self.service_handle(service, status['status'])
+
