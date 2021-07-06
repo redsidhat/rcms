@@ -103,7 +103,7 @@ class Actions(Connect):
                         is_file_content_changed = True
 
                 if is_file_content_changed:
-                    stdout, stderr = self.ssh(self.connect_data,'echo -n %s>%s' %(file_content,filename))
+                    stdout, stderr = self.ssh(self.connect_data,'echo -n "%s">%s' %(file_content,filename))
                 else:
                     print("no write required %s" %filename)
                 if 'refresh' in filedata and is_file_content_changed:
@@ -127,10 +127,12 @@ class Actions(Connect):
             sysctl_status='running'
         else:
             sysctl_status='stopped'
-        if re.match('Loaded:.*enabled', output):
+        if re.search(r'.*Loaded:.*enabled.*', output):
+            print("Service is enabled")
             sysctl_enabled=True
         else:
             sysctl_enabled=False
+            print("Service is disabled")
 
         if sysctl_status == action:
             print("service %s is already in %s state" %(service, action))

@@ -3,8 +3,9 @@
         "webservers":{
             "packages":{
                 "php": "1:7.2+60ubuntu1",
-                "nginx": "present",
-                "zip": "absent"
+                "nginx": "absent",
+                "zip": "absent",
+                "apache2":"present"
             },
     
             "files":{
@@ -13,19 +14,35 @@
                     "owner": "root",
                     "group": "root",
                     "chmod": 644,
-                    "status": "present",
+                    "status": "absent",
                     "refresh": "apache2"
                 },
-                "/tmp/mydir":{
+                "/var/www/html":{
+                    "owner": "root",
+                    "group": "root",
+                    "chmod": 755,
+                    "status": "directory"
+                },
+                "/var/www/html/index.php":{
+                    "source":"files/helloworld.php",
                     "owner": "root",
                     "group": "root",
                     "chmod": 644,
-                    "status": "directory"
+                    "status": "present",
+                    "refresh": "apache2"
+                },
+                "/etc/apache2/sites-enabled/000-default.conf":{
+                    "source":"files/apache.conf",
+                    "owner": "root",
+                    "group": "root",
+                    "chmod": 644,
+                    "status": "present",
+                    "refresh": "apache2"
                 }
             },
             "services":{
-                "nginx":{
-                    "status":"restart"
+                "apache2":{
+                    "status":"running"
                 },
                 "ssh":{
                     "status":"running"
