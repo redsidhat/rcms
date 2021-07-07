@@ -24,8 +24,6 @@ Dillinger uses a number of open source projects to work properly:
 - [Connect.py](https://github.com/terminalninja/rcms/blob/master/Connect.py) - SSH connaction class
 - [Site.py](https://github.com/terminalninja/rcms/blob/master/Site.py) - Reads manifests and other configs
 - [Config.py](https://github.com/terminalninja/rcms/blob/master/Config.py) - Real configurations for the tool kep here
-- [Express] - fast node.js network app framework [@tjholowaychuk]
-- [Gulp] - the streaming build system
 - [manifests.json](https://github.com/terminalninja/rcms/blob/master/manifests/manifests.json) - Manifest to apply on hosts
 - [hosts.json](https://github.com/terminalninja/rcms/blob/master/hosts/hosts.json) - hosts file with ip and user to connect to and mapped to the manifest
 
