@@ -100,4 +100,8 @@ Host file:
 }
 ```
 
+
 #### Limitations
+ - No support for any distros other than debian based
+ - SSH connections uses password, ssh keys are not implemented
+ - Error handling is not very strong here
