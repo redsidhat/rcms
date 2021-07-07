@@ -10,7 +10,7 @@ if __name__ == '__main__':
         for mod,key in mods.items():
             if mod=='packages':
                 print("-------------PACKAGES-START-------------")
-                # obj.package_manager(key)
+                obj.package_manager(key)
                 print("-------------PACKAGES-FINISH------------\n\n")
             elif mod=='files':
                 print("-------------FILES-START----------------")
